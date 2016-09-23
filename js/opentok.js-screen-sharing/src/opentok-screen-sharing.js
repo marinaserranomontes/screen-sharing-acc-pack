@@ -152,7 +152,7 @@
 
       var innerDeferred = $.Deferred();
 
-      var container = publisherDiv || $('#videoHolderScreenShare');
+      var container = publisherDiv || document.getElementById('videoHolderSharedScreen');
 
       _this.publisher = OT.initPublisher(container, _this.localScreenProperties, function (error) {
         if (error) {
@@ -170,7 +170,7 @@
 
     var outerDeferred = $.Deferred();
 
-    if (!!_this.annotation) {
+    if (_this.annotation && _this.externalWindow) {
       _log(_logEventData.enableAnnotations, _logEventData.variationSuccess);
 
       _accPack.setupExternalAnnotation()
@@ -225,12 +225,12 @@
           _log(_logEventData.actionStart, _logEventData.variationError);
         }
       } else {
-        if (_this.annotation) {
+        if (_this.annotation && _this.externalWindow) {
           _accPack.linkAnnotation(_this.publisher, annotationContainer, _this.annotationWindow);
           _log(_logEventData.actionInitialize, _logEventData.variationSuccess);
         }
         _active = true;
-        _triggerEvent('startScreenSharing');
+        _triggerEvent('startScreenSharing', _this.publisher);
         _log(_logEventData.actionStart, _logEventData.variationSuccess);
       }
     });
@@ -250,13 +250,12 @@
 
     var deferred = $.Deferred();
 
-    if (window.location.protocol === 'http:' && !_this.dev ) {
+    if (window.location.protocol === 'http:' && !_this.dev) {
       alert("Screensharing only works under 'https', please add 'https://' in front of your debugger url.");
       deferred.reject('https required');
     }
 
     OT.checkScreenSharingCapability(function (response) {
-      console.log('checkScreenSharingCapability', response);
       if (!response.supported || !response.extensionRegistered) {
         if (OT.$.browser() === 'Firefox' && response.extensionInstalled) {
           deferred.resolve();
@@ -364,7 +363,7 @@
 
   };
 
-  var _validateExtension = function (extensionID, extensionPathFF) {
+  var _validateExtension = function (extensionID) {
 
     if (OT.$.browser() === 'Chrome') {
       if (!extensionID || !extensionID.length) {
@@ -413,6 +412,7 @@
     // Extend our instance
     var optionsProps = [
       'annotation',
+      'externalWindow',
       'extensionURL',
       'extensionID',
       'extensionPathFF',
