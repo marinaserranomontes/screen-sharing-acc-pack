@@ -385,30 +385,6 @@ public class ScreenSharingFragment extends Fragment implements AccPackSession.Se
     }
 
     /*
-   * Enable or disable the annotations in the remote.
-   * @param annotationsEnabled <code>true</code> if remote annotations are enabled; <code>false</code> otherwise.
-   * @param toolbar The annotations toolbar.
-   */
-    public void enableRemoteAnnotations(boolean annotationsEnabled, AnnotationsToolbar toolbar, ViewGroup view, Subscriber subscriber) {
-        try {
-            AnnotationsView remoteAnnotationsView = new AnnotationsView(getContext(), mSession, mApiKey, subscriber);
-
-            AnnotationsVideoRenderer renderer = new AnnotationsVideoRenderer(getContext());
-            subscriber.setRenderer(renderer);
-            remoteAnnotationsView.setVideoRenderer(renderer);
-
-            mRemoteAnnotationsToolbar = toolbar;
-            remoteAnnotationsView.attachToolbar(mRemoteAnnotationsToolbar);
-            isRemoteAnnotationsEnabled = annotationsEnabled;
-
-            onAnnotationsRemoteViewReady(remoteAnnotationsView);
-            ((ViewGroup) view).addView(remoteAnnotationsView);
-        } catch (Exception e){
-            Log.i(LOG_TAG, "Exception - enableRemoteAnnotations: "+e);
-        }
-    }
-
-    /*
     * Enable or disable the audio in the screensharing.
     * @param enabled <code>true</code> if  the audio is enabled; <code>false</code> otherwise.
     */
