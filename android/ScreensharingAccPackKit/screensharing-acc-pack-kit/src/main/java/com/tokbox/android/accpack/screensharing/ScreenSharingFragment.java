@@ -154,14 +154,6 @@ public class ScreenSharingFragment extends Fragment implements AccPackSession.Se
          */
         void onAnnotationsViewReady(AnnotationsView view);
 
-        /**
-         * Invoked when the remote annotations view is ready.
-         *
-         * @param view The remote annotations view.
-         */
-
-        void onAnnotationsRemoteViewReady(AnnotationsView view);
-
     }
 
     /*
@@ -502,12 +494,6 @@ public class ScreenSharingFragment extends Fragment implements AccPackSession.Se
     protected void onAnnotationsViewReady(AnnotationsView view){
         if ( mListener != null ){
             mListener.onAnnotationsViewReady(view);
-        }
-    }
-
-    protected void onAnnotationsRemoteViewReady(AnnotationsView view){
-        if ( mListener != null ){
-            mListener.onAnnotationsRemoteViewReady(view);
         }
     }
 
