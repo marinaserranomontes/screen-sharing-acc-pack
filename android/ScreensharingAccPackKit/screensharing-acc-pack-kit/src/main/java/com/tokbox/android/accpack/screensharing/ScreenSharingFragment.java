@@ -162,12 +162,6 @@ public class ScreenSharingFragment extends Fragment implements AccPackSession.Se
 
         void onAnnotationsRemoteViewReady(AnnotationsView view);
 
-        /**
-         * Invoked when the close button is clicked.
-         *
-         */
-        void onClosed();
-
     }
 
     /*
@@ -505,12 +499,6 @@ public class ScreenSharingFragment extends Fragment implements AccPackSession.Se
         }
     }
 
-    protected void onClosed(){
-        if ( mListener != null ){
-            mListener.onClosed();
-        }
-    }
-
     protected void onAnnotationsViewReady(AnnotationsView view){
         if ( mListener != null ){
             mListener.onAnnotationsViewReady(view);
@@ -591,8 +579,8 @@ public class ScreenSharingFragment extends Fragment implements AccPackSession.Se
         mScreen.removeView(mAnnotationsView);
         checkAnnotations();
         onScreenSharingStopped();
-        onClosed();
         isStarted = false;
+        mAnnotationsView = null;
     }
 
     @Override
