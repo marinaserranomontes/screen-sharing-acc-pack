@@ -1,6 +1,6 @@
 ![logo](../tokbox-logo.png)
 
-# OpenTok Screensharing with Annotations Accelerator Pack for Android<br/>Version 1.0.0
+# OpenTok Screensharing with Annotations Accelerator Pack for Android<br/>Version 1.1.0
 
 This document describes how to use the OpenTok Screensharing with Annotations Accelerator Pack for Android. Through the exploration of the OpenTok Screensharing with Annotations Sample App, you will learn best practices for screensharing on an Android mobile device.
 
@@ -83,7 +83,7 @@ maven { url  "http://tokbox.bintray.com/maven" }
 
 
 <code>
-compile 'com.opentok.android:opentok-screensharing-annotations:1.0.0'
+compile 'com.opentok.android:opentok-screensharing-annotations:1.1.0'
 </code>
 
 </li>
@@ -95,7 +95,7 @@ compile 'com.opentok.android:opentok-screensharing-annotations:1.0.0'
 
 #### Downloading and Installing the AAR File
 
-1.  Download the [Screensharing with Annotations Accelerator Pack zip file](https://s3.amazonaws.com/artifact.tokbox.com/solution/rel/screensharing-annotations-acc-pack/android/opentok-screensharing-annotations-1.0.0.zip) containing the AAR file and documentation, and extract the **opentok-screensharing-annotations-1.0.0.aar** file.
+1.  Download the [Screensharing with Annotations Accelerator Pack zip file](https://s3.amazonaws.com/artifact.tokbox.com/solution/rel/screensharing-annotations-acc-pack/android/opentok-screensharing-annotations-1.1.0.zip) containing the AAR file and documentation, and extract the **opentok-screensharing-annotations-1.1.0.aar** file.
 2.  Right-click the app name and select **Open Module Settings** and click **+**.
 3.  Select **Import .JAR/.AAR Package** and click  **Next**.
 4.  Browse to the **Screensharing with Annotations Accelerator Pack library AAR** and click **Finish**.
