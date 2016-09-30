@@ -88,9 +88,9 @@ static NSString * const KLogVariationFailure = @"Failure";
     static dispatch_once_t onceToken;
     dispatch_once(&onceToken, ^{
         sharedInstance = [[OTScreenSharer alloc] init];
-        sharedInstance.session = [OTAcceleratorSession getAcceleratorPackSession];
     });
-
+    
+    sharedInstance.session = [OTAcceleratorSession getAcceleratorPackSession];
     return sharedInstance;
 }
 

@@ -4,6 +4,13 @@ The changelog for `screensharing-annotation-acc-pack` iOS.
 
 --------------------------------------
 
+1.1.1
+-----
+
+### Fixes
+
+- Fix a bug that `session` can not be updated when multiple acc-packs are running together. 
+
 1.1.0
 -----
 
