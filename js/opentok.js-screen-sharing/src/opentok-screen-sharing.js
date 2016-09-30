@@ -61,7 +61,7 @@
     '<span>Screen Share<br/>Extension Installation</span>',
     '</div>',
     '<p>You need a Firefox extension to share your screen. Install Screensharing Extension. Once you have installed, refresh your browser and click the share screen button again.</p>',
-    '<a href="#" id="btn-install-plugin-ff" class="ots-btn-install" href="">Install extension</a>',
+    '<a href="#" id="btn-install-plugin-ff" class="ots-btn-install">Install extension</a>',
     '<a href="#" id="btn-cancel-plugin-ff" class="ots-cancel-btn-install"></a>',
     '</div>',
     '</div>'
@@ -259,6 +259,9 @@
       if (!response.supported || !response.extensionRegistered) {
         if (OT.$.browser() === 'Firefox' && response.extensionInstalled) {
           deferred.resolve();
+        } else if (OT.$.browser() === 'Firefox' && !response.extensionInstalled) {
+          $('#dialog-form-ff').toggle();
+          deferred.reject('screensharing extension not installed');
         } else {
           alert('This browser does not support screen sharing! Please use Chrome, Firefox or IE!');
           deferred.reject('browser support not available');
@@ -422,10 +425,10 @@
       'dev'
     ];
 
-    _.extend(_this, _.defaults(_.pick(options, optionsProps)), {
+    _.extend(_this, _.defaults(_.pick(options, optionsProps), {
       screenSharingParent: '#videoContainer',
       controlsContainer: '#feedControls'
-    });
+    }));
 
     // Do UIy things
     _setupUI(_this.screensharingParent);
