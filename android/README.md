@@ -102,8 +102,8 @@ _**NOTE:** The accelerator pack contains logic used for logging. This is used to
 | ------------- | ------------- |
 | `ScreenSharingFragment`   | Provides the initializers and methods to enable the publisher to share the screen |
 | `ScreenSharingCapturer`   | Provides a custom VideoCapturer for sharing content displayed in the screensharing area, overriding the mobile device OS default to share content captured by the camera. |
+| `ScreenPublisher`   | Defines a Publisher of PublisherKitVideoTypeScreen type to be used by the ScreenSharingFragment |
 | `ScreenSharingBar`   | Initializes the screensharing bar and its UI controls. |
-
 
 The `ScreenSharingFragment` class is the backbone of the screensharing features for the app. It uses the [`android.media.projection.MediaProjection`](http://developer.android.com/reference/android/media/projection/MediaProjection.html), supported on Android Lollipop, and provides the projection callbacks needed for screensharing.
 
