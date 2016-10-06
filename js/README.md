@@ -1,5 +1,4 @@
-
-![logo](https://raw.githubusercontent.com/opentok/annotation-acc-pack/1.1.0/tokbox-logo.png)
+![logo](../tokbox-logo.png)
 
 # OpenTok Screensharing Accelerator Pack for JavaScript<br/>Version 1.1.0
 
