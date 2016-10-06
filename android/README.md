@@ -134,19 +134,17 @@ The following `ScreenSharingFragment` methods are used to manage the screenshari
 
 
 ```java
-      ScreenSharingFragment mScreenSharingFragment = ScreenSharingFragment.newInstance(mComm.getSession(), OpenTokConfig.API_KEY);
-      mScreenSharingFragment.enableAnnotations(true, mAnnotationsToolbar);
-      mScreenSharingFragment.setListener(this);
+ScreenSharingFragment mScreenSharingFragment = ScreenSharingFragment.newInstance(mComm.getSession(), OpenTokConfig.API_KEY);
+mScreenSharingFragment.enableAnnotations(true, mAnnotationsToolbar);
+mScreenSharingFragment.setListener(this);
 
-      mScreenSharingFragment.start();
+mScreenSharingFragment.start();
       ...
-      mScreenSharingFragment.stop();
+mScreenSharingFragment.stop();
 }
 ```
 
 ## Requirements
-
-To develop your one-to-one communication app:
 
 1. Install [Android Studio](http://developer.android.com/intl/es/sdk/index.html)
 1. Review the [OpenTok Android SDK Requirements](https://tokbox.com/developer/sdks/android/#developerandclientrequirements)
