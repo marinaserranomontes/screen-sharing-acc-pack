@@ -34,7 +34,7 @@ To get up and running quickly with your app, go through the following steps in t
 4. Navigate to the **android** folder, select the **SampleApp** folder, and click **Choose**.
 
 
-<h3 id=addlibrary> Adding the OpenTok Screensharing with Annotations Accelerator Pack library</h3>
+<h3 id=addlibrary> Adding the OpenTok Screensharing Accelerator Pack library</h3>
 
 There are 3 options for installing the OpenTok Screensharing with Annotations Accelerator Pack library:
 
@@ -101,7 +101,7 @@ _**NOTE:** The accelerator pack contains logic used for logging. This is used to
 | Class        | Description  |
 | ------------- | ------------- |
 | `ScreenSharingFragment`   | Provides the initializers and methods to enable the publisher to share the screen |
-| `ScreenSharingCapturer`   | Provides TokBox custom support for sharing content displayed in the screensharing area, overriding the mobile device OS default to share content captured by the camera. |
+| `ScreenSharingCapturer`   | Provides a custom VideoCapturer for sharing content displayed in the screensharing area, overriding the mobile device OS default to share content captured by the camera. |
 | `ScreenSharingBar`   | Initializes the screensharing bar and its UI controls. |
 
 
