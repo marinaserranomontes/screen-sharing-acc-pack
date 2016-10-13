@@ -11,7 +11,7 @@
 #import "OTScreenSharer_Private.h"
 
 static NSString * const kLogComponentIdentifier = @"screenSharingAccPack";
-static NSString * const KLogClientVersion = @"ios-vsol-1.1.0";
+static NSString * const KLogClientVersion = @"ios-vsol-1.1.3";
 static NSString * const KLogActionInitialize = @"Init";
 static NSString * const KLogActionStart = @"Start";
 static NSString * const KLogActionEnd = @"End";
