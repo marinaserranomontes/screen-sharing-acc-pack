@@ -2,6 +2,7 @@ package com.tokbox.android.accpack.screensharing;
 
 import android.annotation.TargetApi;
 import android.app.Activity;
+import android.app.ProgressDialog;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.PixelFormat;
@@ -13,7 +14,6 @@ import android.media.projection.MediaProjection;
 import android.media.projection.MediaProjectionManager;
 import android.os.Build;
 import android.os.Bundle;
-import android.provider.Settings;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.content.Context;
@@ -27,14 +27,7 @@ import android.view.ViewGroup;
 import android.view.WindowManager;
 import android.widget.RelativeLayout;
 
-import com.opentok.android.Connection;
 import com.opentok.android.OpentokError;
-import com.opentok.android.PublisherKit;
-import com.opentok.android.Session;
-import com.opentok.android.Stream;
-import com.opentok.android.Subscriber;
-import com.tokbox.android.accpack.AccPackSession;
-
 
 import com.tokbox.android.annotations.AnnotationsToolbar;
 import com.tokbox.android.annotations.AnnotationsView;
@@ -42,6 +35,11 @@ import com.tokbox.android.accpack.screensharing.config.OpenTokConfig;
 import com.tokbox.android.annotations.utils.AnnotationsVideoRenderer;
 import com.tokbox.android.logging.OTKAnalytics;
 import com.tokbox.android.logging.OTKAnalyticsData;
+import com.tokbox.android.otsdkwrapper.listeners.BasicListener;
+import com.tokbox.android.otsdkwrapper.listeners.ListenerException;
+import com.tokbox.android.otsdkwrapper.listeners.PausableBasicListener;
+import com.tokbox.android.otsdkwrapper.utils.PreviewConfig;
+import com.tokbox.android.otsdkwrapper.wrapper.OTWrapper;
 
 import java.util.UUID;
 
@@ -50,7 +48,7 @@ import java.util.UUID;
  * Defines a fragment to represent the ScreenSharing acc-pack
  *
  */
-public class ScreenSharingFragment extends Fragment implements AccPackSession.SessionListener, PublisherKit.PublisherListener, AccPackSession.SignalListener, ScreenSharingBar.ScreenSharingBarListener{
+public class ScreenSharingFragment extends Fragment implements ScreenSharingBar.ScreenSharingBarListener{
 
     private static final String LOG_TAG = ScreenSharingFragment.class.getSimpleName();
 
@@ -59,11 +57,7 @@ public class ScreenSharingFragment extends Fragment implements AccPackSession.Se
     private static final String ERROR = "ScreenSharing error";
     private static final int REQUEST_MEDIA_PROJECTION = 1;
 
-    private AccPackSession mSession;
-    private ScreenPublisher mScreenPublisher;
     private String mApiKey;
-    private boolean isConnected;
-
     private ScreenSharingListener mListener;
 
     private VirtualDisplay mVirtualDisplay;
@@ -75,15 +69,11 @@ public class ScreenSharingFragment extends Fragment implements AccPackSession.Se
     private MediaProjection mMediaProjection;
     private ImageReader mImageReader;
 
-
     private int mResultCode;
     private Intent mResultData;
 
-    private RelativeLayout mScreenView;
-
     private AnnotationsView mAnnotationsView;
     private AnnotationsToolbar mAnnotationsToolbar;
-    private AnnotationsToolbar mRemoteAnnotationsToolbar;
 
     private ScreenSharingBar mScreensharingBar;
 
@@ -100,13 +90,10 @@ public class ScreenSharingFragment extends Fragment implements AccPackSession.Se
     private OTKAnalyticsData mAnalyticsData;
     private OTKAnalytics mAnalytics;
 
+    private OTWrapper mWrapper;
 
-    @Override
-    public void onSignalReceived(Session session, String type, String data, Connection connection) {
-        if (type.equals("annotations")){
-            Log.i(LOG_TAG, "New annotation received");
-        }
-    }
+    ProgressDialog mProgressDialog;
+
 
     @Override
     public void onClose() {
@@ -169,12 +156,11 @@ public class ScreenSharingFragment extends Fragment implements AccPackSession.Se
 
     }
 
-    public static ScreenSharingFragment newInstance(AccPackSession session, String apiKey) {
+    public static ScreenSharingFragment newInstance(OTWrapper wrapper, String apiKey) {
 
         ScreenSharingFragment fragment = new ScreenSharingFragment();
 
-        fragment.mSession = session;
-        fragment.mSession.setSessionListener(fragment);
+        fragment.mWrapper = wrapper;
         fragment.mApiKey = apiKey;
 
         return fragment;
@@ -194,6 +180,8 @@ public class ScreenSharingFragment extends Fragment implements AccPackSession.Se
         mAnalyticsData = new OTKAnalyticsData.Builder(OpenTokConfig.LOG_CLIENT_VERSION, source, OpenTokConfig.LOG_COMPONENTID, guidVSol).build();
         mAnalytics = new OTKAnalytics(mAnalyticsData);
 
+        mWrapper.addBasicListener(mBasicListener);
+
         checkSessionInfo();
 
         addLogEvent(OpenTokConfig.LOG_ACTION_INITIALIZE, OpenTokConfig.LOG_VARIATION_SUCCESS);
@@ -201,9 +189,9 @@ public class ScreenSharingFragment extends Fragment implements AccPackSession.Se
 
     private void checkSessionInfo(){
         if ( mAnalytics != null ){
-            if ( mSession != null ) {
-                mAnalyticsData.setSessionId(mSession.getSessionId());
-                mAnalyticsData.setConnectionId(mSession.getConnection().getConnectionId());
+            if ( mWrapper != null ) {
+                mAnalyticsData.setSessionId(mWrapper.getOTConfig().getSessionId());
+                mAnalyticsData.setConnectionId(mWrapper.getOwnConnId());
             }
             if ( mApiKey != null ) {
                 mAnalyticsData.setPartnerId(mApiKey);
@@ -266,15 +254,12 @@ public class ScreenSharingFragment extends Fragment implements AccPackSession.Se
 
         //create ScreenCapturer
         ScreenSharingCapturer capturer = new ScreenSharingCapturer(getContext(), mScreen, mImageReader);
-
-        mScreenPublisher = new ScreenPublisher(getContext(), "screenPublisher", isAudioEnabled, true, capturer);
-        mScreenPublisher.setPublisherVideoType(PublisherKit.PublisherKitVideoType.PublisherKitVideoTypeScreen);
-        mScreenPublisher.setPublisherListener(this);
-
-        mRenderer = new AnnotationsVideoRenderer(getContext());
-        mScreenPublisher.setRenderer(mRenderer);
-
-        mSession.publish(mScreenPublisher);
+        if ( mWrapper != null ) {
+            mRenderer = new AnnotationsVideoRenderer(getContext());
+            PreviewConfig config = new PreviewConfig.PreviewConfigBuilder().
+                    name("screenPublisher").capturer(capturer).renderer(mRenderer).build();
+            mWrapper.startSharingMedia(config, true);
+        }
     }
 
     @TargetApi(Build.VERSION_CODES.LOLLIPOP)
@@ -315,6 +300,134 @@ public class ScreenSharingFragment extends Fragment implements AccPackSession.Se
         tearDownMediaProjection();
     }
 
+
+    private BasicListener mBasicListener =
+            new PausableBasicListener(new BasicListener<OTWrapper>() {
+
+                @Override
+                public void onConnected(OTWrapper otWrapper, int participantsCount, String connId, String data) throws ListenerException {
+
+                }
+
+                @Override
+                public void onDisconnected(OTWrapper otWrapper, int participantsCount, String connId, String data) throws ListenerException {
+
+                }
+
+                @Override
+                public void onPreviewViewReady(OTWrapper otWrapper, View localView) throws ListenerException {
+
+                }
+
+                @Override
+                public void onPreviewViewDestroyed(OTWrapper otWrapper, View localView) throws ListenerException {
+
+                }
+
+                @Override
+                public void onRemoteViewReady(OTWrapper otWrapper, View remoteView, String remoteId, String data) throws ListenerException {
+
+                }
+
+                @Override
+                public void onRemoteViewDestroyed(OTWrapper otWrapper, View remoteView, String remoteId) throws ListenerException {
+
+                }
+
+                @Override
+                public void onStartedSharingMedia(OTWrapper otWrapper, boolean screensharing) throws ListenerException {
+                    if (screensharing){
+                        onScreenSharingStarted();
+                        //show connections dialog
+                        mProgressDialog.dismiss();
+
+                        checkAnnotations();
+                        isStarted = true;
+                        try {
+                            getActivity().runOnUiThread(new Runnable() {
+                                @Override
+                                public void run() {
+
+                                    if ( isAnnotationsEnabled ) {
+                                if (mAnnotationsView == null) {
+                                    try {
+                                        mAnnotationsView = new AnnotationsView(getContext(), mWrapper, mApiKey, true);
+                                        mAnnotationsView.attachToolbar(mAnnotationsToolbar);
+                                        mAnnotationsView.setVideoRenderer(mRenderer); //to use screencapture
+                                    } catch (Exception e) {
+                                        e.printStackTrace();
+                                    }
+                                  }
+                                onAnnotationsViewReady(mAnnotationsView);
+                                mScreen.addView(mAnnotationsView);
+                            }
+                            mScreensharingBar = new ScreenSharingBar(getContext(), ScreenSharingFragment.this);
+
+                            //add screensharing bar on top of the screen
+                                    WindowManager.LayoutParams params = new WindowManager.LayoutParams(
+                                            WindowManager.LayoutParams.MATCH_PARENT,
+                                            WindowManager.LayoutParams.WRAP_CONTENT,
+                                            WindowManager.LayoutParams.TYPE_APPLICATION_PANEL,
+                                            0 | WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE,
+                                            PixelFormat.TRANSLUCENT);
+                                    params.gravity = Gravity.LEFT | Gravity.TOP;
+                                    params.x = 0;
+                                    params.y = 0;
+
+                                    WindowManager wm = (WindowManager) getContext().getSystemService(Context.WINDOW_SERVICE);
+                                    wm.addView(mScreensharingBar, params);
+                                }
+                            });
+
+                        }catch(Exception e){
+                            Log.i(LOG_TAG, "Exception - onStreamCreated "+e);
+                        }
+                    }
+                }
+
+                @Override
+                public void onStoppedSharingMedia(OTWrapper otWrapper, boolean screensharing) throws ListenerException {
+                    if (screensharing) {
+                        getActivity().runOnUiThread(new Runnable() {
+                            @Override
+                            public void run() {
+                                mScreen.removeView(mScreensharingBar);
+                                mScreen.removeView(mAnnotationsView);
+                                checkAnnotations();
+                                onScreenSharingStopped();
+                                isStarted = false;
+                                mAnnotationsView = null;
+                            }});
+                    }
+                }
+
+                @Override
+                public void onRemoteJoined(OTWrapper otWrapper, String remoteId) throws ListenerException {
+
+                }
+
+                @Override
+                public void onRemoteLeft(OTWrapper otWrapper, String remoteId) throws ListenerException {
+
+                }
+
+                @Override
+                public void onRemoteVideoChange(OTWrapper otWrapper, String remoteId, String reason, boolean videoActive, boolean subscribed) throws ListenerException {
+
+                }
+
+                @Override
+                public void onError(OTWrapper otWrapper, OpentokError error) throws ListenerException {
+                    onScreenSharingError(ERROR + ": "+error.getMessage());
+                    if (isStarted()){
+                        addLogEvent(OpenTokConfig.LOG_ACTION_END, OpenTokConfig.LOG_VARIATION_ERROR);
+                    }
+                    else {
+                        addLogEvent(OpenTokConfig.LOG_ACTION_START, OpenTokConfig.LOG_VARIATION_ERROR);
+                    }
+                }
+            });
+
     /*
      * Set the screen sharing listener.
      * @param mListener The screen sharing listener.
@@ -328,12 +441,22 @@ public class ScreenSharingFragment extends Fragment implements AccPackSession.Se
     */
     public void start(){
         init();
-        if (isConnected) {
+        if ( mWrapper!= null && mWrapper.getOwnConnId()!= null ) {
             checkSessionInfo(); //add session info to the logging
 
             if (mVirtualDisplay == null) {
                 addLogEvent(OpenTokConfig.LOG_ACTION_START, OpenTokConfig.LOG_VARIATION_ATTEMPT);
-                startScreenCapture();
+                getActivity().runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        startScreenCapture();
+                        //show connections dialog
+                        mProgressDialog = new ProgressDialog(getContext());
+                        mProgressDialog.setTitle("Please wait");
+                        mProgressDialog.setMessage("Starting screen sharing...");
+                        mProgressDialog.show();
+                    }
+                });
             }
         }
     }
@@ -341,13 +464,16 @@ public class ScreenSharingFragment extends Fragment implements AccPackSession.Se
     /*
     * Stop sharing the screen.
     */
-    public void stop(){
+    public void stop() {
         addLogEvent(OpenTokConfig.LOG_ACTION_END, OpenTokConfig.LOG_VARIATION_ATTEMPT);
-        stopScreenCapture();
-        if (mScreenPublisher != null) {
-            mSession.unpublish(mScreenPublisher);
-        }
-        removeScreensharingBar();
+        getActivity().runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                stopScreenCapture();
+                mWrapper.stopSharingMedia(true);
+                removeScreensharingBar();
+            }
+        });
     }
 
     /*
@@ -473,7 +599,6 @@ public class ScreenSharingFragment extends Fragment implements AccPackSession.Se
             mResultData = data;
             setUpMediaProjection();
             setUpVirtualDisplay();
-
         }
     }
 
@@ -502,88 +627,4 @@ public class ScreenSharingFragment extends Fragment implements AccPackSession.Se
             mListener.onAnnotationsViewReady(view);
         }
     }
-
-    @Override
-    public void onConnected(Session session) {
-        isConnected = true;
-    }
-
-    @Override
-    public void onDisconnected(Session session) {
-        isConnected = false;
-    }
-
-    @Override
-    public void onStreamReceived(Session session, Stream stream) {
-
-    }
-
-    @Override
-    public void onStreamDropped(Session session, Stream stream) {
-
-    }
-
-    @Override
-    public void onError(Session session, OpentokError opentokError) {
-        stop();
-        onScreenSharingError(ERROR + ": "+ opentokError.toString());
-    }
-
-    @Override
-    public void onStreamCreated(PublisherKit publisherKit, Stream stream) {
-        onScreenSharingStarted();
-        checkAnnotations();
-        isStarted = true;
-        try {
-            if ( isAnnotationsEnabled ) {
-                if (mAnnotationsView == null) {
-                    mAnnotationsView = new AnnotationsView(getContext(), mSession, mApiKey, true, mScreenPublisher);
-                    mAnnotationsView.attachToolbar(mAnnotationsToolbar);
-                    mAnnotationsView.setVideoRenderer(mRenderer); //to use screencapture
-                }
-                onAnnotationsViewReady(mAnnotationsView);
-                mScreen.addView(mAnnotationsView);
-            }
-            mScreensharingBar = new ScreenSharingBar(getContext(), this);
-
-            //add screensharing bar on top of the screen
-            WindowManager.LayoutParams params = new WindowManager.LayoutParams(
-                    WindowManager.LayoutParams.MATCH_PARENT,
-                    WindowManager.LayoutParams.WRAP_CONTENT,
-                    WindowManager.LayoutParams.TYPE_APPLICATION_PANEL,
-                    0 | WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE,
-                    PixelFormat.TRANSLUCENT);
-            params.gravity = Gravity.LEFT | Gravity.TOP;
-            params.x = 0;
-            params.y = 0;
-
-            WindowManager wm = (WindowManager) getContext().getSystemService(Context.WINDOW_SERVICE);
-            wm.addView(mScreensharingBar, params);
-        }catch(Exception e){
-            Log.i(LOG_TAG, "Exception - onStreamCreated "+e);
-        }
-    }
-
-    @Override
-    public void onStreamDestroyed(PublisherKit publisherKit, Stream stream) {
-        mScreenPublisher = null;
-        mScreen.removeView(mScreensharingBar);
-        mScreen.removeView(mAnnotationsView);
-        checkAnnotations();
-        onScreenSharingStopped();
-        isStarted = false;
-        mAnnotationsView = null;
-    }
-
-    @Override
-    public void onError(PublisherKit publisherKit, OpentokError opentokError) {
-        onScreenSharingError(ERROR + ": "+opentokError.getMessage());
-        if (isStarted()){
-            addLogEvent(OpenTokConfig.LOG_ACTION_END, OpenTokConfig.LOG_VARIATION_ERROR);
-        }
-        else {
-            addLogEvent(OpenTokConfig.LOG_ACTION_START, OpenTokConfig.LOG_VARIATION_ERROR);
-        }
-    }
-
 }
