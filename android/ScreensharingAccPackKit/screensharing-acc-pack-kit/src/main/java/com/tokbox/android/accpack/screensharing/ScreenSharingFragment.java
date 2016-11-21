@@ -258,7 +258,7 @@ public class ScreenSharingFragment extends Fragment implements ScreenSharingBar.
             mRenderer = new AnnotationsVideoRenderer(getContext());
             PreviewConfig config = new PreviewConfig.PreviewConfigBuilder().
                     name("screenPublisher").capturer(capturer).renderer(mRenderer).build();
-            mWrapper.startSharingMedia(config, true);
+            mWrapper.startPublishingMedia(config, true);
         }
     }
 
@@ -335,7 +335,7 @@ public class ScreenSharingFragment extends Fragment implements ScreenSharingBar.
                 }
 
                 @Override
-                public void onStartedSharingMedia(OTWrapper otWrapper, boolean screensharing) throws ListenerException {
+                public void onStartedPublishingMedia(OTWrapper otWrapper, boolean screensharing) throws ListenerException {
                     if (screensharing){
                         onScreenSharingStarted();
                         //show connections dialog
@@ -386,7 +386,7 @@ public class ScreenSharingFragment extends Fragment implements ScreenSharingBar.
                 }
 
                 @Override
-                public void onStoppedSharingMedia(OTWrapper otWrapper, boolean screensharing) throws ListenerException {
+                public void onStoppedPublishingMedia(OTWrapper otWrapper, boolean screensharing) throws ListenerException {
                     if (screensharing) {
                         getActivity().runOnUiThread(new Runnable() {
                             @Override
@@ -412,7 +412,7 @@ public class ScreenSharingFragment extends Fragment implements ScreenSharingBar.
                 }
 
                 @Override
-                public void onRemoteVideoChange(OTWrapper otWrapper, String remoteId, String reason, boolean videoActive, boolean subscribed) throws ListenerException {
+                public void onRemoteVideoChanged(OTWrapper otWrapper, String remoteId, String reason, boolean videoActive, boolean subscribed) throws ListenerException {
 
                 }
 
@@ -470,7 +470,7 @@ public class ScreenSharingFragment extends Fragment implements ScreenSharingBar.
             @Override
             public void run() {
                 stopScreenCapture();
-                mWrapper.stopSharingMedia(true);
+                mWrapper.stopPublishingMedia(true);
                 removeScreensharingBar();
             }
         });
