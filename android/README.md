@@ -1,6 +1,6 @@
 ![logo](../tokbox-logo.png)
 
-# OpenTok Screensharing Accelerator Pack for Android<br/>Version 1.1
+# OpenTok Screensharing Accelerator Pack for Android<br/>Version 2.0
 
 This document describes how to use the OpenTok Screensharing Accelerator Pack for Android. Through the exploration of the OpenTok Screensharing with Annotations Sample App, you will learn best practices for screensharing on an Android mobile device.
 
@@ -72,7 +72,7 @@ maven { url  "http://tokbox.bintray.com/maven" }
 
 
 <code>
-compile 'com.opentok.android:opentok-screensharing-annotations:1.1.0'
+compile 'com.opentok.android:opentok-screensharing-annotations:2.0.0'
 </code>
 
 </li>
@@ -84,7 +84,7 @@ compile 'com.opentok.android:opentok-screensharing-annotations:1.1.0'
 
 #### Downloading and Installing the AAR File
 
-1.  Download the [Screensharing with Annotations Accelerator Pack zip file](https://s3.amazonaws.com/artifact.tokbox.com/solution/rel/screensharing-annotations-acc-pack/android/opentok-screensharing-annotations-1.1.0.zip) containing the AAR file and documentation, and extract the **opentok-screensharing-annotations-1.1.0.aar** file.
+1.  Download the [Screensharing with Annotations Accelerator Pack zip file](https://s3.amazonaws.com/artifact.tokbox.com/solution/rel/screensharing-annotations-acc-pack/android/opentok-screensharing-annotations-1.1.0.zip) containing the AAR file and documentation, and extract the **opentok-screensharing-annotations-2.0.0.aar** file.
 2.  Right-click the app name and select **Open Module Settings** and click **+**.
 3.  Select **Import .JAR/.AAR Package** and click  **Next**.
 4.  Browse to the **Screensharing with Annotations Accelerator Pack library AAR** and click **Finish**.
@@ -134,7 +134,7 @@ The following `ScreenSharingFragment` methods are used to manage the screenshari
 
 
 ```java
-ScreenSharingFragment mScreenSharingFragment = ScreenSharingFragment.newInstance(mComm.getSession(), OpenTokConfig.API_KEY);
+ScreenSharingFragment mScreenSharingFragment = ScreenSharingFragment.newInstance(sdkWrapper, OpenTokConfig.API_KEY);
 mScreenSharingFragment.enableAnnotations(true, mAnnotationsToolbar);
 mScreenSharingFragment.setListener(this);
 
@@ -147,8 +147,9 @@ mScreenSharingFragment.stop();
 ## Requirements
 
 1. Install [Android Studio](http://developer.android.com/intl/es/sdk/index.html)
-1. Review the [OpenTok Android SDK Requirements](https://tokbox.com/developer/sdks/android/#developerandclientrequirements)
-1. OpenTok Screensharing Accelerator Pack requires Android Lollipop or later.
+2. Review the [OpenTok Android SDK Requirements](https://tokbox.com/developer/sdks/android/#developerandclientrequirements)
+3. Review the [OpenTok Android SDK Wrapper](https://github.com/opentok/acc-pack-common/tree/master/android)
+4. OpenTok Screensharing Accelerator Pack requires Android Lollipop or later.
 
 
 
