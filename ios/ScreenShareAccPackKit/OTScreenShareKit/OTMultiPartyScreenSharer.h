@@ -61,6 +61,12 @@ typedef void (^OTMultiPartyScreenSharerBlock)(OTCommunicationSignal signal, OTMu
  */
 @property (readonly, nonatomic) BOOL isScreenSharing;
 
+/**
+ *  `YES` means that it won't subscribe to any streams, default is `NO`. 
+ *  Turning it `NO` will make it subscribe to available streams.
+ *  Turning it `YES` will unsubscribe and remove all subscribers
+ */
+@property (nonatomic, getter=isPublishOnly) BOOL publishOnly;
 
 #pragma mark - publisher
 /**
