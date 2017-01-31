@@ -136,7 +136,7 @@
 
   var _setupUI = function (parent) {
     $('body').append(_screenDialogsExtensions);
-    $(_this.controlsContainer).append(_screenSharingControl);
+    _this.appendControl && $(_this.controlsContainer).append(_screenSharingControl);
     $(parent).append(_screenSharingView);
   };
 
@@ -449,6 +449,7 @@
       'controlsContainer',
       'screenProperties',
       'localScreenProperties',
+      'appendControl',
       'dev',
     ];
 
@@ -457,6 +458,7 @@
       screenSharingParent: '#videoContainer',
       screenSharingContainer: document.getElementById('videoHolderSharedScreen'),
       controlsContainer: '#feedControls',
+      appendControl: true,
     }));
 
 
