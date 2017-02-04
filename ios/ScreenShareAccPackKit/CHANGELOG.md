@@ -4,6 +4,10 @@ The changelog for `screensharing-annotation-acc-pack` iOS.
 
 --------------------------------------
 
+### MIGRATION
+
+We will rename and migrate `screen-share-kit` iOS to `OTAcceleratorCore`[here](https://github.com/opentok/accelerator-core-ios)
+
 2.0.5
 -----
 
