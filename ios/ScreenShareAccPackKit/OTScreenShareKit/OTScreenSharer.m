@@ -50,7 +50,11 @@ static NSString * const KLogVariationFailure = @"Failure";
 @property (nonatomic) OTSubscriber *subscriber;
 @property (nonatomic) OTAcceleratorSession *session;
 @property (nonatomic) OTPublisher *publisher;
-@property (nonatomic) OTScreenCapture *screenCapture;
+
+@property (nonatomic) UIView *publisherView;
+@property (nonatomic) UIView *subscriberView;
+
+@property (strong, nonatomic) OTScreenShareBlock handler;
 
 @property (nonatomic) OTVideoView *publisherView;
 @property (nonatomic) OTVideoView *subscriberView;
@@ -327,6 +331,16 @@ static NSString * const KLogVariationFailure = @"Failure";
 }
 
 #pragma mark - Setters and Getters
+
+- (BOOL)isRemoteAudioAvailable {
+    if (!_subscriber) return NO;
+    return _subscriber.stream.hasAudio;
+}
+
+- (BOOL)isRemoteVideoAvailable {
+    if (!_subscriber) return NO;
+    return _subscriber.stream.hasVideo;
+}
 
 - (BOOL)isRemoteAudioAvailable {
     if (!_subscriber) return NO;
